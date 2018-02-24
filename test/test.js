@@ -8,7 +8,7 @@ describe('#tuneinRadio', function() {
     let tunein = new TuneIn();
     let browse = tunein.browse();
 
-    browse.then(function(results) {
+    return browse.then(function(results) {
       let title = results.head.title;
       expect(title).to.equal('Browse');
 
@@ -31,7 +31,7 @@ describe('#tuneinRadio', function() {
     let tunein = new TuneIn();
     let browse = tunein.browse_local();
 
-    browse.then(function(results) {
+    return browse.then(function(results) {
       let status = results.head.status;
       expect(status).to.equal('200');
 
