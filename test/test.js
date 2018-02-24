@@ -96,4 +96,51 @@ describe('#tuneinRadio', function() {
       expect(genre.URL).to.equal("http://opml.radiotime.com/Browse.ashx?id=" + guide_id);
     });
   });
+
+  // Test calls to browse_sports
+  it('browse_sports should return a list of sport radio categories', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_sports();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('Sports');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+
+      let genre = items[0];
+      expect(genre.element).to.equal("outline");
+      expect(genre.type).to.equal("link");
+      let guide_id = genre.guide_id;
+      expect(genre.URL).to.equal("http://opml.radiotime.com/Browse.ashx?id=" + guide_id);
+    });
+  });
+
+  // Test calls to browse_locations
+  it('browse_locations should return a list of geographical areas', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_locations();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('By Location');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+
+      let area = items[0];
+      expect(area.element).to.equal("outline");
+      expect(area.type).to.equal("link");
+      expect(area.text).to.equal("Africa");
+      let guide_id = area.guide_id;
+      expect(area.URL).to.equal("http://opml.radiotime.com/Browse.ashx?id=" + guide_id);
+    });
+  });
+
+
 });
