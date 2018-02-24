@@ -1,0 +1,41 @@
+{
+  "name": "node-tunein-radio",
+  "version": "0.1.0",
+  "description": "NodeJS Module to browse, search and play streams from TuneIn Radio",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec",
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*",
+    "lint": "eslint --ignore-path .gitignore ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piffio/node-tunein-radio.git"
+  },
+  "keywords": [
+    "tunein",
+    "volumio"
+  ],
+  "author": "Sergio Visinoni <piffio@piffio.org> (https://github.com/piffio/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/piffio/node-tunein-radio/issues"
+  },
+  "homepage": "https://github.com/piffio/node-tunein-radio#readme",
+  "engines": {
+    "node": ">=6.11.0"
+  },
+  "dependencies": {
+    "ajv": "^6.1.1",
+    "axios": "^0.17.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.0",
+    "eslint": "^4.9.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.0.1"
+  }
+}
