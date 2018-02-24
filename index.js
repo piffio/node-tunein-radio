@@ -93,15 +93,15 @@ module.exports =  class TuneIn {
   }
 
   browse_music(username) {
-    return this.browse(channel = 'music');
+    return this.browse({channel: 'music'});
   }
 
   browse_talk(username) {
-    return this.browse(channel = 'talk');
+    return this.browse({channel: 'talk'});
   }
 
   browse_sports(username) {
-    return this.browse(channel = 'sports');
+    return this.browse({channel: 'sports'});
   }
 
   browse_locations(username) {
@@ -109,18 +109,18 @@ module.exports =  class TuneIn {
   }
 
   browse_langs(username) {
-    return this.browse(channel = 'lang');
+    return this.browse({channel: 'lang'});
   }
 
   browse_podcast(username) {
-    return this.browse(channel = 'podcast');
+    return this.browse({channel: 'podcast'});
   }
 
   browse_popular(username) {
-    return this.browse(channel = 'popular');
+    return this.browse({channel: 'popular'});
   }
 
   browse_best(username) {
-    return this.browse(channel = 'best');
+    return this.browse({channel: 'best'});
   }
 }

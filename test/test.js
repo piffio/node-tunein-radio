@@ -4,6 +4,7 @@ var expect = require('chai').expect;
 var TuneIn = require('../index');
 
 describe('#tuneinRadio', function() {
+  // Test calls to browse()
   it('should return main categories when browsing with no parameters', function() {
     let tunein = new TuneIn();
     let browse = tunein.browse();
@@ -16,7 +17,7 @@ describe('#tuneinRadio', function() {
       expect(status).to.equal('200');
 
       let items = results.body;
-      expect(items.length).to.equal(7);
+      expect(items).to.have.lengthOf(7);
 
       let local = results.body[0];
       expect(local.element).to.equal("outline");
@@ -27,6 +28,7 @@ describe('#tuneinRadio', function() {
     });
   });
 
+  // Test calls to browse_local()
   it('browse_local should return a list of radio stations', function() {
     let tunein = new TuneIn();
     let browse = tunein.browse_local();
@@ -36,7 +38,6 @@ describe('#tuneinRadio', function() {
       expect(status).to.equal('200');
 
       let items = results.body;
-      expect(items).to.have.lengthOf(1);
 
       let stationList = items[0];
       expect(stationList.element).to.equal("outline");
@@ -50,4 +51,27 @@ describe('#tuneinRadio', function() {
       expect(station.item).to.equal("station");
     });
   });
+
+  // Test calls to browse_music()
+  it('browse_music should return a list of music genres', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_music();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('Music');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+
+      let genre = items[0];
+      expect(genre.element).to.equal("outline");
+      expect(genre.type).to.equal("link");
+      let guide_id = genre.guide_id;
+      expect(genre.URL).to.equal("http://opml.radiotime.com/Browse.ashx?id=" + guide_id);
+    });
+  });
+
 });
