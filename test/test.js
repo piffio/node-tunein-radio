@@ -26,4 +26,28 @@ describe('#tuneinRadio', function() {
       expect(local.key).to.equal("local");
     });
   });
+
+  it('browse_local should return a list of radio stations', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse();
+
+    browse.then(function(results) {
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+      expect(items).to.have.lengthOf(1);
+
+      let stationList = items[0];
+      expect(stationList.element).to.equal("outline");
+      expect(stationList.text).to.equal("Stations");
+      expect(stationList.key).to.equal("stations");
+      expect(stationList.children).to.be.an('array');
+
+      let station = stationList.children[0];
+      expect(station.element).to.equal("outline");
+      expect(station.type).to.equal("audio");
+      expect(station.item).to.equal("station");
+    });
+  });
 });
