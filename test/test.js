@@ -74,4 +74,26 @@ describe('#tuneinRadio', function() {
     });
   });
 
+
+  // Test calls to browse_talk
+  it('browse_talk should return a list of talk music categories', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_talk();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('Talk');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+
+      let genre = items[0];
+      expect(genre.element).to.equal("outline");
+      expect(genre.type).to.equal("link");
+      let guide_id = genre.guide_id;
+      expect(genre.URL).to.equal("http://opml.radiotime.com/Browse.ashx?id=" + guide_id);
+    });
+  });
 });
