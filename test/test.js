@@ -43,7 +43,6 @@ describe('#tuneinRadio', function() {
       let stationList = items[0];
       expect(stationList.element).to.equal("outline");
       expect(stationList.text).to.not.be.undefined;
-      expect(stationList.key).to.not.be.undefined;
       expect(stationList.children).to.be.an('array');
 
       let station = stationList.children[0];
