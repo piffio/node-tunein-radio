@@ -29,7 +29,7 @@ describe('#tuneinRadio', function() {
 
   it('browse_local should return a list of radio stations', function() {
     let tunein = new TuneIn();
-    let browse = tunein.browse();
+    let browse = tunein.browse_local();
 
     browse.then(function(results) {
       let status = results.head.status;

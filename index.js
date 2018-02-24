@@ -65,6 +65,10 @@ module.exports =  class TuneIn {
     let username = options.username || '';
 
     this.req.url = '/Browse.ashx';
+
+    if (channel) {
+      this.req.params.c = channel;
+    }
     if (id) {
       this.req.params.id = id;
     }
@@ -85,7 +89,7 @@ module.exports =  class TuneIn {
   }
 
   browse_local(username) {
-    return this.browse(channel = 'local', username = username);
+    return this.browse({channel: 'local', username: username});
   }
 
   browse_music(username) {
