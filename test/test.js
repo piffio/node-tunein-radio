@@ -38,11 +38,12 @@ describe('#tuneinRadio', function() {
       expect(status).to.equal('200');
 
       let items = results.body;
+      expect(items).to.be.an('array');
 
       let stationList = items[0];
       expect(stationList.element).to.equal("outline");
-      expect(stationList.text).to.equal("Stations");
-      expect(stationList.key).to.equal("stations");
+      expect(stationList.text).to.not.be.undefined;
+      expect(stationList.key).to.not.be.undefined;
       expect(stationList.children).to.be.an('array');
 
       let station = stationList.children[0];
@@ -142,5 +143,94 @@ describe('#tuneinRadio', function() {
     });
   });
 
+  // Test calls to browse_langs
+  it('browse_langs should return a list of languages', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_langs();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('By Language');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+
+      let area = items[0];
+      expect(area.element).to.equal("outline");
+      expect(area.type).to.equal("link");
+      expect(area.text).to.equal("Aboriginal");
+      let guide_id = area.guide_id;
+    });
+  });
+
+  // Test calls to browse_podcast
+  it('browse_podcast should return a list of podcasts', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_podcast();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('Podcasts');
+
+      let items = results.body;
+      expect(items).to.be.an('array');
+
+      let podcastTypes = items[0];
+      expect(podcastTypes.element).to.equal("outline");
+      expect(podcastTypes.text).to.equal("Music");
+      expect(podcastTypes.children).to.be.an('array');
+
+      let podcast = podcastTypes.children[0];
+      expect(podcast.element).to.equal("outline");
+      expect(podcast.type).to.equal("link");
+      expect(podcast.guide_id).to.not.be.undefined;
+    });
+  });
+
+  // Test calls to browse_popular
+  it('browse_popular should return a list of popular radio stations', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_popular();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('Trending');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+      expect(items).to.be.an('array');
+
+      let station = items[0];
+      expect(station.element).to.equal("outline");
+      expect(station.type).to.equal("audio");
+      expect(station.item).to.equal("station");
+    });
+  });
+
+  // Test calls to browse_best
+  it('browse_best should return a list of the best radio stations', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.browse_best();
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.be.undefined;
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+      expect(items).to.be.an('array');
+
+      let station = items[0];
+      expect(station.element).to.equal("outline");
+      expect(station.type).to.equal("audio");
+      expect(station.item).to.equal("station");
+    });
+  });
 
 });
