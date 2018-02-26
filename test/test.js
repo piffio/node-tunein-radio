@@ -232,4 +232,24 @@ describe('#tuneinRadio', function() {
     });
   });
 
+  // Test call to tune_radio
+  it('tune_radio should return details about a radio stream', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.tune_radio('s67868');
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.be.undefined;
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let station = results.body[0];
+      expect(station.element).to.equal("audio");
+      expect(station.url).to.equal("http://provisioning.streamtheworld.com/pls/MAXIMAFM.pls?DIST=TuneIn&TGT=TuneIn&maxServers=2");
+      expect(station.media_type).to.equal("mp3");
+      expect(station.guide_id).to.equal("e2060591");
+    });
+  });
+
 });

@@ -15,8 +15,6 @@ module.exports =  class TuneIn {
       render: 'json'
     }
 
-    this.req = {};
-    this.req.params = {};
     // TODO set partnerId
   }
 
@@ -38,9 +36,9 @@ module.exports =  class TuneIn {
 
   }
 
-  call_tunein() {
+  call_tunein(req) {
     return new Promise( (resolve, reject) => {
-      axios.get(this.req.url, this.req)
+      axios.get(req.url, req)
         .then(function(results) {
           let head = results.data.head;
           if (head.status != 200) {
@@ -55,6 +53,16 @@ module.exports =  class TuneIn {
     });
   }
 
+  tune_radio(id) {
+    let req = {};
+    req.params = {};
+
+    req.url = '/Tune.ashx';
+    req.params.id = id;
+
+    return this.call_tunein(req);
+  }
+
   browse(options) {
     options = options || {};
     let channel = options.channel || '';
@@ -64,28 +72,30 @@ module.exports =  class TuneIn {
     let pivot = options.pivot || '';
     let username = options.username || '';
 
-    this.req.url = '/Browse.ashx';
+    let req = {};
+    req.params = {};
+    req.url = '/Browse.ashx';
 
     if (channel) {
-      this.req.params.c = channel;
+      req.params.c = channel;
     }
     if (id) {
-      this.req.params.id = id;
+      req.params.id = id;
     }
     if (filter) {
-      this.req.params.filter = filter;
+      req.params.filter = filter;
     }
     if (offset) {
-      this.req.params.offset = offset;
+      req.params.offset = offset;
     }
     if (pivot) {
-      this.req.params.pivot = pivot;
+      req.params.pivot = pivot;
     }
     if (username) {
-      this.req.params.username = username;
+      req.params.username = username;
     }
 
-    return this.call_tunein();
+    return this.call_tunein(req);
   }
 
   browse_local(username) {
