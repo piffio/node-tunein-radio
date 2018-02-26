@@ -32,8 +32,14 @@ module.exports =  class TuneIn {
     return true;
   }
 
-  search() {
+  search(query) {
+    let req = {};
+    req.params = {};
 
+    req.url = '/Search.ashx';
+    req.params.query = query;
+
+    return this.call_tunein(req);
   }
 
   call_tunein(req) {

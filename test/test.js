@@ -252,4 +252,25 @@ describe('#tuneinRadio', function() {
     });
   });
 
+  // Test call to search
+  it('search should return a list of matches for a particular query', function() {
+    let tunein = new TuneIn();
+    let browse = tunein.search('rai radio');
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('Search Results: rai radio');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body;
+      expect(items).to.be.an('array');
+
+      let station = items[0];
+      expect(station.element).to.equal("outline");
+      expect(station.type).to.equal("audio");
+      expect(station.item).to.equal("station");
+    });
+  });
 });
