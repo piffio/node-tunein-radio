@@ -1,6 +1,7 @@
 'use strict';
 
 const axios = require('axios');
+const { URL } = require('url');
 
 module.exports =  class TuneIn {
   constructor() {
@@ -16,20 +17,6 @@ module.exports =  class TuneIn {
     }
 
     // TODO set partnerId
-  }
-
-  is_genre_id(id) {
-    if (id == null || id.length == 0 || id[0] != 'g') {
-      return false;
-    }
-    return true;
-  }
-
-  is_region_id(id) {
-    if (id == null || id.length == 0 || id[0] != 'r') {
-      return false;
-    }
-    return true;
   }
 
   search(query) {
@@ -50,6 +37,12 @@ module.exports =  class TuneIn {
           if (head.status != 200) {
             reject(results.data);
             return new Error(`TuneIn Request error: ${head.fault}`);
+          }
+
+          for (var i in results.data.body) {
+            if (results.data.body[i].URL) {
+              results.data.body[i].URLObj = new URL(results.data.body[i].URL);
+            }
           }
           return resolve((results.data));
         })

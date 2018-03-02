@@ -24,6 +24,7 @@ describe('#tuneinRadio', function() {
       expect(local.type).to.equal("link");
       expect(local.text).to.equal("Local Radio");
       expect(local.URL).to.equal("http://opml.radiotime.com/Browse.ashx?c=local");
+      expect(local.URLObj.href).to.equal("http://opml.radiotime.com/Browse.ashx?c=local");
       expect(local.key).to.equal("local");
     });
   });
