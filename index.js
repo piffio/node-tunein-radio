@@ -1,7 +1,7 @@
 'use strict';
 
 const axios = require('axios');
-const { URL } = require('url');
+const url = require('url');
 
 module.exports =  class TuneIn {
   constructor() {
@@ -41,7 +41,7 @@ module.exports =  class TuneIn {
 
           for (var i in results.data.body) {
             if (results.data.body[i].URL) {
-              results.data.body[i].URLObj = new URL(results.data.body[i].URL);
+              results.data.body[i].URLObj = url.parse(results.data.body[i].URL);
             }
           }
           return resolve((results.data));
