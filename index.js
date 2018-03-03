@@ -41,7 +41,7 @@ module.exports =  class TuneIn {
 
           for (var i in results.data.body) {
             if (results.data.body[i].URL) {
-              results.data.body[i].URLObj = url.parse(results.data.body[i].URL);
+              results.data.body[i].URLObj = url.parse(results.data.body[i].URL, true);
             }
           }
           return resolve((results.data));
@@ -64,7 +64,7 @@ module.exports =  class TuneIn {
 
   browse(options) {
     options = options || {};
-    let channel = options.channel || '';
+    let c = options.c || '';
     let id = options.id || '';
     let filter = options.filter || '';
     let offset = options.offset || '';
@@ -75,8 +75,8 @@ module.exports =  class TuneIn {
     req.params = {};
     req.url = '/Browse.ashx';
 
-    if (channel) {
-      req.params.c = channel;
+    if (c) {
+      req.params.c = c;
     }
     if (id) {
       req.params.id = id;
@@ -98,19 +98,19 @@ module.exports =  class TuneIn {
   }
 
   browse_local(username) {
-    return this.browse({channel: 'local', username: username});
+    return this.browse({c: 'local', username: username});
   }
 
   browse_music(username) {
-    return this.browse({channel: 'music'});
+    return this.browse({c: 'music'});
   }
 
   browse_talk(username) {
-    return this.browse({channel: 'talk'});
+    return this.browse({c: 'talk'});
   }
 
   browse_sports(username) {
-    return this.browse({channel: 'sports'});
+    return this.browse({c: 'sports'});
   }
 
   browse_locations(username) {
@@ -118,18 +118,18 @@ module.exports =  class TuneIn {
   }
 
   browse_langs(username) {
-    return this.browse({channel: 'lang'});
+    return this.browse({c: 'lang'});
   }
 
   browse_podcast(username) {
-    return this.browse({channel: 'podcast'});
+    return this.browse({c: 'podcast'});
   }
 
   browse_popular(username) {
-    return this.browse({channel: 'popular'});
+    return this.browse({c: 'popular'});
   }
 
   browse_best(username) {
-    return this.browse({channel: 'best'});
+    return this.browse({c: 'best'});
   }
 }
