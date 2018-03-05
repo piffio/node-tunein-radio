@@ -82,7 +82,7 @@ module.exports =  class TuneIn {
     return this.call_tunein(req);
   }
 
-  browse(options) {
+  call_browse(options, req) {
     options = options || {};
     let c = options.c || '';
     let id = options.id || '';
@@ -90,10 +90,6 @@ module.exports =  class TuneIn {
     let offset = options.offset || '';
     let pivot = options.pivot || '';
     let username = options.username || '';
-
-    let req = {};
-    req.params = {};
-    req.url = '/Browse.ashx';
 
     if (c) {
       req.params.c = c;
@@ -115,6 +111,22 @@ module.exports =  class TuneIn {
     }
 
     return this.call_tunein(req);
+  }
+
+  browse_show(options) {
+    let req = {};
+    req.params = {};
+    req.url = '/Tune.ashx';
+
+    return this.call_browse(options, req);
+  }
+
+  browse(options) {
+    let req = {};
+    req.params = {};
+    req.url = '/Browse.ashx';
+
+    return this.call_browse(options, req);
   }
 
   browse_local(username) {

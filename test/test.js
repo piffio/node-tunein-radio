@@ -270,4 +270,32 @@ describe('#tuneinRadio', function() {
       expect(station.item).to.equal("station");
     });
   });
+
+  // Test call to browse_show
+  it('browse_show should return a list of episodes for a Show', function() {
+    //?c=pbrowse&id=p191418&render=json'
+    let options = {
+      c: 'pbrowse',
+      id: 'p191418',
+    };
+
+    let browse = tunein.browse_show(options);
+
+    return browse.then(function(results) {
+      let title = results.head.title;
+      expect(title).to.equal('Nocturnal Listening Options');
+
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let items = results.body[0].children;
+      expect(items).to.be.an('array');
+
+      let station = items[0];
+      expect(station.element).to.equal("outline");
+      expect(station.type).to.equal("audio");
+      expect(station.item).to.equal("topic");
+    });
+  });
+
 });
