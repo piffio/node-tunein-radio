@@ -3,12 +3,18 @@
 var expect = require('chai').expect;
 var TuneIn = require('../index');
 
+var tuneinOptions = {
+  protocol: 'https',
+  cacheRequests: true,
+  cacheTTL: 1000 * 60 * 60,
+};
+
+var tunein = new TuneIn(tuneinOptions);
+
 describe('#tuneinRadio', function() {
   // Test calls to browse()
   it('should return main categories when browsing with no parameters', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse();
-
     return browse.then(function(results) {
       let title = results.head.title;
       expect(title).to.equal('Browse');
@@ -32,7 +38,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_local()
   it('browse_local should return a list of radio stations', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_local();
 
     return browse.then(function(results) {
@@ -56,7 +61,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_music()
   it('browse_music should return a list of music genres', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_music();
 
     return browse.then(function(results) {
@@ -79,7 +83,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_talk
   it('browse_talk should return a list of talk music categories', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_talk();
 
     return browse.then(function(results) {
@@ -101,7 +104,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_sports
   it('browse_sports should return a list of sport radio categories', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_sports();
 
     return browse.then(function(results) {
@@ -123,7 +125,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_locations
   it('browse_locations should return a list of geographical areas', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_locations();
 
     return browse.then(function(results) {
@@ -146,7 +147,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_langs
   it('browse_langs should return a list of languages', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_langs();
 
     return browse.then(function(results) {
@@ -168,7 +168,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_podcast
   it('browse_podcast should return a list of podcasts', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_podcast();
 
     return browse.then(function(results) {
@@ -192,7 +191,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_popular
   it('browse_popular should return a list of popular radio stations', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_popular();
 
     return browse.then(function(results) {
@@ -214,7 +212,6 @@ describe('#tuneinRadio', function() {
 
   // Test calls to browse_best
   it('browse_best should return a list of the best radio stations', function() {
-    let tunein = new TuneIn();
     let browse = tunein.browse_best();
 
     return browse.then(function(results) {
@@ -236,7 +233,6 @@ describe('#tuneinRadio', function() {
 
   // Test call to tune_radio
   it('tune_radio should return details about a radio stream', function() {
-    let tunein = new TuneIn();
     let browse = tunein.tune_radio('s67868');
 
     return browse.then(function(results) {
@@ -256,7 +252,6 @@ describe('#tuneinRadio', function() {
 
   // Test call to search
   it('search should return a list of matches for a particular query', function() {
-    let tunein = new TuneIn();
     let browse = tunein.search('rai radio');
 
     return browse.then(function(results) {

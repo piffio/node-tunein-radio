@@ -1,22 +1,42 @@
 'use strict';
 
 const axios = require('axios');
+const axiosExtensions = require('axios-extensions');
 const url = require('url');
 
 module.exports =  class TuneIn {
-  constructor() {
-    this.init();
+  constructor(options) {
+    this.init(options);
   }
 
-  init() {
+  init(options) {
+    options = options || {};
+    let protocol = options.protocol || 'https';
+    let cacheRequests = options.cacheRequests || false;
+    let cacheTTL = options.cacheTTL || 1000 * 60 * 10;
+    let partnerId = options.partnerId || '';
+
     this.url = {};
 
-    axios.defaults.baseURL = 'https://opml.radiotime.com';
+    axios.defaults.baseURL = protocol + '://opml.radiotime.com';
     axios.defaults.params = {
       render: 'json'
     }
 
-    // TODO set partnerId
+    if (cacheRequests === true) {
+      axios.defaults.adapter = axiosExtensions.cacheAdapterEnhancer(
+        axios.defaults.adapter,
+        true,
+        'cache',
+        cacheTTL
+      );
+    }
+
+    if (partnerId != '') {
+      axios.defaults.params.push({
+        partnerId: partnerId
+      });
+    }
   }
 
   search(query) {
