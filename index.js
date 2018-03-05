@@ -33,9 +33,7 @@ module.exports =  class TuneIn {
     }
 
     if (partnerId != '') {
-      axios.defaults.params.push({
-        partnerId: partnerId
-      });
+      axios.defaults.params.partnerId = partnerId;
     }
   }
 
