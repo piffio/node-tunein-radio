@@ -3,6 +3,7 @@
 const axios = require('axios');
 const axiosExtensions = require('axios-extensions');
 const url = require('url');
+const qs = require('qs');
 
 module.exports =  class TuneIn {
   constructor(options) {
@@ -18,10 +19,11 @@ module.exports =  class TuneIn {
 
     this.url = {};
 
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
     axios.defaults.baseURL = protocol + '://opml.radiotime.com';
     axios.defaults.params = {
       render: 'json'
-    }
+    };
 
     if (cacheRequests === true) {
       axios.defaults.adapter = axiosExtensions.cacheAdapterEnhancer(
@@ -44,10 +46,10 @@ module.exports =  class TuneIn {
     req.url = '/Search.ashx';
     req.params.query = query;
 
-    return this.call_tunein(req);
+    return this.call_tunein_get(req);
   }
 
-  call_tunein(req) {
+  call_tunein_get(req) {
     return new Promise( (resolve, reject) => {
       axios.get(req.url, req)
         .then(function(results) {
@@ -70,6 +72,23 @@ module.exports =  class TuneIn {
     });
   }
 
+  call_tunein_post(req, postData) {
+    return new Promise( (resolve, reject) => {
+      axios.post(req.url, qs.stringify(postData), req)
+        .then(function(results) {
+          let head = results.data.head;
+          if (head.status != 200) {
+            reject(results.data);
+            return new Error(`TuneIn Request error: ${head.fault}`);
+          }
+          return resolve((results.data));
+        })
+        .catch(function(err) {
+            return new Error(`TuneIn Request error: ${err}`);
+        });
+    });
+  }
+
   tune_radio(id) {
     let req = {};
     req.params = {};
@@ -77,7 +96,18 @@ module.exports =  class TuneIn {
     req.url = '/Tune.ashx';
     req.params.id = id;
 
-    return this.call_tunein(req);
+    return this.call_tunein_get(req);
+  }
+
+  authenticate(options) {
+    options = options || {};
+
+    let req = {};
+    req.url = '/Account.ashx';
+    req.params = {};
+    req.params.c = 'auth';
+
+    return this.call_tunein_post(req, options);
   }
 
   call_browse(options, req) {
@@ -108,7 +138,7 @@ module.exports =  class TuneIn {
       req.params.username = username;
     }
 
-    return this.call_tunein(req);
+    return this.call_tunein_get(req);
   }
 
   browse_show(options) {
