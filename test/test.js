@@ -344,7 +344,7 @@ describe('#tuneinRadio', function() {
       let status = results.head.status;
       expect(status).to.equal('200');
 
-      let items = results.body[1].children;
+      let items = results.body[0].children;
       expect(items).to.be.an('array');
 
       let station = items[0];
