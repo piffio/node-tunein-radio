@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('chai').expect;
-var TuneIn = require('../index');
+var TuneIn = require('../src/index');
 
 var tuneinOptions = {
   protocol: 'https',
@@ -330,7 +330,6 @@ describe('#tuneinRadio', function() {
 
   // Test call to browse_show
   it('browse_show should return a list of episodes for a Show', function() {
-    //?c=pbrowse&id=p191418&render=json'
     let options = {
       c: 'pbrowse',
       id: 'p191418',
@@ -345,7 +344,7 @@ describe('#tuneinRadio', function() {
       let status = results.head.status;
       expect(status).to.equal('200');
 
-      let items = results.body[0].children;
+      let items = results.body[1].children;
       expect(items).to.be.an('array');
 
       let station = items[0];
