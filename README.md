@@ -37,6 +37,10 @@ var tunein = new TuneIn({
 });
 ```
 
+# Documentation
+
+You can read the full documentation on [GitHub Pages](https://piffio.github.io/node-tunein-radio/).
+
 # License
 
 MIT
