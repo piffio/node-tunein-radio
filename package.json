@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "ajv": "^6.1.1",
-    "axios": "^0.17.1",
+    "axios": "^0.18.0",
     "axios-extensions": "^1.2.0"
   },
   "devDependencies": {
