@@ -354,4 +354,19 @@ describe('#tuneinRadio', function() {
     });
   });
 
+  // Test call to describe
+  it('describe should return detailed information about a stream', function() {
+    let browse = tunein.describe('s67868');
+
+    return browse.then(function(results) {
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let streamDetail = results.body[0];
+
+      expect(streamDetail.key).to.equal('station');
+      expect(streamDetail.text).to.equal('Máxima FM 104.2');
+      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/p296882q.png');
+    });
+  });
 });

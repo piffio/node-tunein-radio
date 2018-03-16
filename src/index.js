@@ -125,13 +125,29 @@ module.exports =  class TuneIn {
 
   /**
    * Tune a stream. This will return an object containing details for the specific stream, including URL and format.
-   * @params {string} id the ID of the stream to tune, usually resulting from a browsing or a search call
+   * @param {string} id The ID of the stream to tune, usually resulting from a browsing or a search call
    */
   tune_radio(id) {
     let req = {};
     req.params = {};
 
     req.url = '/Tune.ashx';
+    req.params.id = id;
+
+    return this._call_tunein_get(req);
+  }
+
+  /**
+   * Describe a stream. This method will retrieve detailed information about a stream.
+   *
+   * @param {string} id The ID of the stream to fetch information for
+   */
+  describe(id) {
+    let req = {};
+    req.params = {};
+
+    req.url = '/Describe.ashx';
+    req.params.c = 'nowplaying';
     req.params.id = id;
 
     return this._call_tunein_get(req);
