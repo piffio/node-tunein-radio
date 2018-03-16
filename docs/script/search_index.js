@@ -390,6 +390,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/index.js~tunein#describe",
+    "class/src/index.js~TuneIn.html#instance-method-describe",
+    "src/index.js~TuneIn#describe",
+    "method"
+  ],
+  [
     "src/index.js~tunein#search",
     "class/src/index.js~TuneIn.html#instance-method-search",
     "src/index.js~TuneIn#search",
