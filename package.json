@@ -1,6 +1,6 @@
 {
   "name": "node-tunein-radio",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "NodeJS Module to browse, search and play streams from TuneIn Radio",
   "main": "src/index.js",
   "scripts": {
