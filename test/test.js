@@ -356,7 +356,23 @@ describe('#tuneinRadio', function() {
 
   // Test call to describe
   it('describe should return detailed information about a stream', function() {
-    let browse = tunein.describe('s67868');
+    let browse = tunein.describe('s25211');
+
+    return browse.then(function(results) {
+      let status = results.head.status;
+      expect(status).to.equal('200');
+
+      let streamDetail = results.body[0];
+
+      expect(streamDetail.element).to.equal('station');
+      expect(streamDetail.name).to.equal('RAI Radio 3');
+      expect(streamDetail.logo).to.equal('http://cdn-profiles.tunein.com/s25211/images/logoq.jpg');
+    });
+  });
+
+  // Test call to describe
+  it('describe nowplaying should return detailed information about a stream', function() {
+    let browse = tunein.describe('s25211', true);
 
     return browse.then(function(results) {
       let status = results.head.status;
@@ -365,8 +381,8 @@ describe('#tuneinRadio', function() {
       let streamDetail = results.body[0];
 
       expect(streamDetail.key).to.equal('station');
-      expect(streamDetail.text).to.equal('Máxima FM 104.2');
-      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/p296882q.png');
+      expect(streamDetail.text).to.equal('RAI Radio 3 93.7');
+      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/__s25211q.jpg');
     });
   });
 });

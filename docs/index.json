@@ -567,7 +567,7 @@
     "__docId__": 48,
     "kind": "file",
     "name": "src/index.js",
-    "content": "'use strict';\n\nconst axios = require('axios');\nconst axiosExtensions = require('axios-extensions');\nconst url = require('url');\nconst qs = require('qs');\n\n/**\n * TuneIn class, the main class implementing the module\n *\n * @example\n * let tuneinOptions = {\n *  protocol: 'https',                        // Protocol to use, either http or https\n *  cacheRequests: true,                      // Wheter to cache results or not, default false\n *  cacheTTL: 1000 * 60 * 60,                 // Cache TTL, default 5 minutes\n *  partnerId: process.env.TUNEIN_PARTNERID,  // PartnerID to be used when interacting with the TuneIn API\n *  };\n *\n * let tunein = new TuneIn(tuneinOptions);\n */\nmodule.exports =  class TuneIn {\n  /**\n   * Constructur for a TuneIn object.\n   * @param {object} options this is an options object with all the optionals parameters used to initialise the TuneIn client\n   * @example\n   * let tuneinOptions = {\n   *   protocol: 'https',                        // Protocol to use, either http or https\n   *   cacheRequests: true,                      // Wheter to cache results or not, default false\n   *   cacheTTL: 1000 * 60 * 60,                 // Cache TTL, default 5 minutes\n   *   partnerId: process.env.TUNEIN_PARTNERID,  // PartnerID to be used when interacting with the TuneIn API\n   * };\n   */\n  constructor(options) {\n    options = options || {};\n    let protocol = options.protocol || 'https';\n    let cacheRequests = options.cacheRequests || false;\n    let cacheTTL = options.cacheTTL || 1000 * 60 * 10;\n    let partnerId = options.partnerId || '';\n\n    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';\n    axios.defaults.baseURL = protocol + '://opml.radiotime.com';\n    axios.defaults.params = {\n      render: 'json'\n    };\n\n    if (cacheRequests === true) {\n      axios.defaults.adapter = axiosExtensions.cacheAdapterEnhancer(\n        axios.defaults.adapter,\n        true,\n        'cache',\n        cacheTTL\n      );\n    }\n\n    if (partnerId != '') {\n      axios.defaults.params.partnerId = partnerId;\n    }\n  }\n\n  /**\n   * Search TuneIn for a match\n   * @param {string} query a query string to search for in the TuneIn catalog\n   * @example\n   * let queryString = 'rai radio';\n   * let search = tunein.search(queryString);\n   * search.then(function(results) {\n   *   console.log(results);\n   * });\n   */\n  search(query) {\n    let req = {};\n    req.params = {};\n\n    req.url = '/Search.ashx';\n    req.params.query = query;\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * @private\n   */\n  _call_tunein_get(req) {\n    return new Promise( (resolve, reject) => {\n      axios.get(req.url, req)\n        .then(function(results) {\n          let head = results.data.head;\n          if (head.status != 200) {\n            reject(results.data);\n            return new Error(`TuneIn Request error: ${head.fault}`);\n          }\n\n          for (var i in results.data.body) {\n            if (results.data.body[i].URL) {\n              results.data.body[i].URLObj = url.parse(results.data.body[i].URL, true);\n            }\n          }\n          return resolve((results.data));\n        })\n        .catch(function(err) {\n            return new Error(`TuneIn Request error: ${err}`);\n        });\n    });\n  }\n\n  /**\n   * @private\n   */\n  _call_tunein_post(req, postData) {\n    return new Promise( (resolve, reject) => {\n      axios.post(req.url, qs.stringify(postData), req)\n        .then(function(results) {\n          let head = results.data.head;\n          if (head.status != 200) {\n            reject(results.data);\n            return new Error(`TuneIn Request error: ${head.fault}`);\n          }\n          return resolve((results.data));\n        })\n        .catch(function(err) {\n            return new Error(`TuneIn Request error: ${err}`);\n        });\n    });\n  }\n\n  /**\n   * Tune a stream. This will return an object containing details for the specific stream, including URL and format.\n   * @param {string} id The ID of the stream to tune, usually resulting from a browsing or a search call\n   */\n  tune_radio(id) {\n    let req = {};\n    req.params = {};\n\n    req.url = '/Tune.ashx';\n    req.params.id = id;\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * Describe a stream. This method will retrieve detailed information about a stream.\n   *\n   * @param {string} id The ID of the stream to fetch information for\n   */\n  describe(id) {\n    let req = {};\n    req.params = {};\n\n    req.url = '/Describe.ashx';\n    req.params.c = 'nowplaying';\n    req.params.id = id;\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * Authenticate with supplied username / password, to get access to favorite and customised results\n   * @param {object} options Options to be passed to the POST call, must contain user's credential\n   * @example\n   * let authOptions = {\n   *   username: 'user@example.com',\n   *   password: 'secretpassword'\n   * };\n   * let auth = tunein.authenticate(authOptions);\n   * auth.then(function(results) {\n   *   console.log(results[0].AccountId);\n   * });\n   */\n  authenticate(options) {\n    options = options || {};\n\n    let req = {};\n    req.url = '/Account.ashx';\n    req.params = {};\n    req.params.c = 'auth';\n\n    return this._call_tunein_post(req, options);\n  }\n\n  /**\n   * @private\n   */\n  _call_browse(options, req) {\n    options = options || {};\n    let c = options.c || '';\n    let id = options.id || '';\n    let filter = options.filter || '';\n    let offset = options.offset || '';\n    let pivot = options.pivot || '';\n    let username = options.username || '';\n\n    if (c) {\n      req.params.c = c;\n    }\n    if (id) {\n      req.params.id = id;\n    }\n    if (filter) {\n      req.params.filter = filter;\n    }\n    if (offset) {\n      req.params.offset = offset;\n    }\n    if (pivot) {\n      req.params.pivot = pivot;\n    }\n    if (username) {\n      req.params.username = username;\n    }\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * Browse a podcast (Show) for episodes details\n   * @param {object} options - Options object including the show ID\n   * @example\n   * let showOptions = {\n   *   c: 'pbrowse',\n   *   id: 'p191418'\n   * };\n   * let show = tunein.browse_show(showOptions);\n   * show.then(function(results) {\n   *   console.log(results);\n   * });\n   */\n  browse_show(options) {\n    let req = {};\n    req.params = {};\n    req.url = '/Tune.ashx';\n\n    return this._call_browse(options, req);\n  }\n\n  /**\n   * Browse will browse the TuneIn directory depending on the supplied options paramethers\n   *\n   * @param {object} options - Options object for browsing\n   * @return {object} results - A JSON object with results from the remote API\n   */\n  browse(options) {\n    let req = {};\n    req.params = {};\n    req.url = '/Browse.ashx';\n\n    return this._call_browse(options, req);\n  }\n\n  /**\n   * Browse the local streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_local(username) {\n    return this.browse({c: 'local', username: username});\n  }\n\n  /**\n   * Browse the Music streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_music(username) {\n    return this.browse({c: 'music'});\n  }\n\n  /**\n   * Browse the talk streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_talk(username) {\n    return this.browse({c: 'talk'});\n  }\n\n  /**\n   * Browse the sports streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_sports(username) {\n    return this.browse({c: 'sports'});\n  }\n\n  /**\n   * Browse streams locations\n   * @param {string} username - Currently ignored\n   */\n  browse_locations(username) {\n    return this.browse({id : 'r0'});\n  }\n\n  /**\n   * Browse streams languages\n   * @param {string} username - Currently ignored\n   */\n  browse_langs(username) {\n    return this.browse({c: 'lang'});\n  }\n\n  /**\n   * Browse the podcasts directory\n   * @param {string} username - Currently ignored\n   */\n  browse_podcast(username) {\n    return this.browse({c: 'podcast'});\n  }\n\n  /**\n   * Browse the popular streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_popular(username) {\n    return this.browse({c: 'popular'});\n  }\n\n  /**\n   * Browse the best streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_best(username) {\n    return this.browse({c: 'best'});\n  }\n}\n",
+    "content": "'use strict';\n\nconst axios = require('axios');\nconst axiosExtensions = require('axios-extensions');\nconst url = require('url');\nconst qs = require('qs');\n\n/**\n * TuneIn class, the main class implementing the module\n *\n * @example\n * let tuneinOptions = {\n *  protocol: 'https',                        // Protocol to use, either http or https\n *  cacheRequests: true,                      // Wheter to cache results or not, default false\n *  cacheTTL: 1000 * 60 * 60,                 // Cache TTL, default 5 minutes\n *  partnerId: process.env.TUNEIN_PARTNERID,  // PartnerID to be used when interacting with the TuneIn API\n *  };\n *\n * let tunein = new TuneIn(tuneinOptions);\n */\nmodule.exports =  class TuneIn {\n  /**\n   * Constructur for a TuneIn object.\n   * @param {object} options this is an options object with all the optionals parameters used to initialise the TuneIn client\n   * @example\n   * let tuneinOptions = {\n   *   protocol: 'https',                        // Protocol to use, either http or https\n   *   cacheRequests: true,                      // Wheter to cache results or not, default false\n   *   cacheTTL: 1000 * 60 * 60,                 // Cache TTL, default 5 minutes\n   *   partnerId: process.env.TUNEIN_PARTNERID,  // PartnerID to be used when interacting with the TuneIn API\n   * };\n   */\n  constructor(options) {\n    options = options || {};\n    let protocol = options.protocol || 'https';\n    let cacheRequests = options.cacheRequests || false;\n    let cacheTTL = options.cacheTTL || 1000 * 60 * 10;\n    let partnerId = options.partnerId || '';\n\n    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';\n    axios.defaults.baseURL = protocol + '://opml.radiotime.com';\n    axios.defaults.params = {\n      render: 'json'\n    };\n\n    if (cacheRequests === true) {\n      axios.defaults.adapter = axiosExtensions.cacheAdapterEnhancer(\n        axios.defaults.adapter,\n        true,\n        'cache',\n        cacheTTL\n      );\n    }\n\n    if (partnerId != '') {\n      axios.defaults.params.partnerId = partnerId;\n    }\n  }\n\n  /**\n   * Search TuneIn for a match\n   * @param {string} query a query string to search for in the TuneIn catalog\n   * @example\n   * let queryString = 'rai radio';\n   * let search = tunein.search(queryString);\n   * search.then(function(results) {\n   *   console.log(results);\n   * });\n   */\n  search(query) {\n    let req = {};\n    req.params = {};\n\n    req.url = '/Search.ashx';\n    req.params.query = query;\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * @private\n   */\n  _call_tunein_get(req) {\n    return new Promise( (resolve, reject) => {\n      axios.get(req.url, req)\n        .then(function(results) {\n          let head = results.data.head;\n          if (head.status != 200) {\n            reject(results.data);\n            return new Error(`TuneIn Request error: ${head.fault}`);\n          }\n\n          for (var i in results.data.body) {\n            if (results.data.body[i].URL) {\n              results.data.body[i].URLObj = url.parse(results.data.body[i].URL, true);\n            }\n          }\n          return resolve((results.data));\n        })\n        .catch(function(err) {\n            return new Error(`TuneIn Request error: ${err}`);\n        });\n    });\n  }\n\n  /**\n   * @private\n   */\n  _call_tunein_post(req, postData) {\n    return new Promise( (resolve, reject) => {\n      axios.post(req.url, qs.stringify(postData), req)\n        .then(function(results) {\n          let head = results.data.head;\n          if (head.status != 200) {\n            reject(results.data);\n            return new Error(`TuneIn Request error: ${head.fault}`);\n          }\n          return resolve((results.data));\n        })\n        .catch(function(err) {\n            return new Error(`TuneIn Request error: ${err}`);\n        });\n    });\n  }\n\n  /**\n   * Tune a stream. This will return an object containing details for the specific stream, including URL and format.\n   * @param {string} id The ID of the stream to tune, usually resulting from a browsing or a search call\n   */\n  tune_radio(id) {\n    let req = {};\n    req.params = {};\n\n    req.url = '/Tune.ashx';\n    req.params.id = id;\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * Describe a stream. This method will retrieve detailed information about a stream.\n   *\n   * @param {string} id The ID of the stream to fetch information for\n   * @param {boolean} nowplaying If true it also fetches information about the show being currently aired\n   */\n  describe(id, nowplaying = false) {\n    let req = {};\n    req.params = {};\n\n    req.url = '/Describe.ashx';\n    if (nowplaying == true) {\n      req.params.c = 'nowplaying';\n    }\n    req.params.id = id;\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * Authenticate with supplied username / password, to get access to favorite and customised results\n   * @param {object} options Options to be passed to the POST call, must contain user's credential\n   * @example\n   * let authOptions = {\n   *   username: 'user@example.com',\n   *   password: 'secretpassword'\n   * };\n   * let auth = tunein.authenticate(authOptions);\n   * auth.then(function(results) {\n   *   console.log(results[0].AccountId);\n   * });\n   */\n  authenticate(options) {\n    options = options || {};\n\n    let req = {};\n    req.url = '/Account.ashx';\n    req.params = {};\n    req.params.c = 'auth';\n\n    return this._call_tunein_post(req, options);\n  }\n\n  /**\n   * @private\n   */\n  _call_browse(options, req) {\n    options = options || {};\n    let c = options.c || '';\n    let id = options.id || '';\n    let filter = options.filter || '';\n    let offset = options.offset || '';\n    let pivot = options.pivot || '';\n    let username = options.username || '';\n\n    if (c) {\n      req.params.c = c;\n    }\n    if (id) {\n      req.params.id = id;\n    }\n    if (filter) {\n      req.params.filter = filter;\n    }\n    if (offset) {\n      req.params.offset = offset;\n    }\n    if (pivot) {\n      req.params.pivot = pivot;\n    }\n    if (username) {\n      req.params.username = username;\n    }\n\n    return this._call_tunein_get(req);\n  }\n\n  /**\n   * Browse a podcast (Show) for episodes details\n   * @param {object} options - Options object including the show ID\n   * @example\n   * let showOptions = {\n   *   c: 'pbrowse',\n   *   id: 'p191418'\n   * };\n   * let show = tunein.browse_show(showOptions);\n   * show.then(function(results) {\n   *   console.log(results);\n   * });\n   */\n  browse_show(options) {\n    let req = {};\n    req.params = {};\n    req.url = '/Tune.ashx';\n\n    return this._call_browse(options, req);\n  }\n\n  /**\n   * Browse will browse the TuneIn directory depending on the supplied options paramethers\n   *\n   * @param {object} options - Options object for browsing\n   * @return {object} results - A JSON object with results from the remote API\n   */\n  browse(options) {\n    let req = {};\n    req.params = {};\n    req.url = '/Browse.ashx';\n\n    return this._call_browse(options, req);\n  }\n\n  /**\n   * Browse the local streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_local(username) {\n    return this.browse({c: 'local', username: username});\n  }\n\n  /**\n   * Browse the Music streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_music(username) {\n    return this.browse({c: 'music'});\n  }\n\n  /**\n   * Browse the talk streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_talk(username) {\n    return this.browse({c: 'talk'});\n  }\n\n  /**\n   * Browse the sports streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_sports(username) {\n    return this.browse({c: 'sports'});\n  }\n\n  /**\n   * Browse streams locations\n   * @param {string} username - Currently ignored\n   */\n  browse_locations(username) {\n    return this.browse({id : 'r0'});\n  }\n\n  /**\n   * Browse streams languages\n   * @param {string} username - Currently ignored\n   */\n  browse_langs(username) {\n    return this.browse({c: 'lang'});\n  }\n\n  /**\n   * Browse the podcasts directory\n   * @param {string} username - Currently ignored\n   */\n  browse_podcast(username) {\n    return this.browse({c: 'podcast'});\n  }\n\n  /**\n   * Browse the popular streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_popular(username) {\n    return this.browse({c: 'popular'});\n  }\n\n  /**\n   * Browse the best streams category\n   * @param {string} username - Currently ignored\n   */\n  browse_best(username) {\n    return this.browse({c: 'best'});\n  }\n}\n",
     "static": true,
     "longname": "/home/piffio/src/volumio/node-tunein-radio/src/index.js",
     "access": "public",
@@ -752,7 +752,7 @@
     "longname": "src/index.js~TuneIn#describe",
     "access": "public",
     "description": "Describe a stream. This method will retrieve detailed information about a stream.",
-    "lineNumber": 145,
+    "lineNumber": 146,
     "params": [
       {
         "nullable": null,
@@ -763,6 +763,16 @@
         "optional": false,
         "name": "id",
         "description": "The ID of the stream to fetch information for"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "boolean"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "nowplaying",
+        "description": "If true it also fetches information about the show being currently aired"
       }
     ],
     "return": {
@@ -785,7 +795,7 @@
     "examples": [
       "let authOptions = {\n  username: 'user@example.com',\n  password: 'secretpassword'\n};\nlet auth = tunein.authenticate(authOptions);\nauth.then(function(results) {\n  console.log(results[0].AccountId);\n});"
     ],
-    "lineNumber": 169,
+    "lineNumber": 172,
     "params": [
       {
         "nullable": null,
@@ -815,7 +825,7 @@
     "longname": "src/index.js~TuneIn#_call_browse",
     "access": "private",
     "description": "",
-    "lineNumber": 183,
+    "lineNumber": 186,
     "params": [
       {
         "name": "options",
@@ -850,7 +860,7 @@
     "examples": [
       "let showOptions = {\n  c: 'pbrowse',\n  id: 'p191418'\n};\nlet show = tunein.browse_show(showOptions);\nshow.then(function(results) {\n  console.log(results);\n});"
     ],
-    "lineNumber": 227,
+    "lineNumber": 230,
     "params": [
       {
         "nullable": null,
@@ -880,7 +890,7 @@
     "longname": "src/index.js~TuneIn#browse",
     "access": "public",
     "description": "Browse will browse the TuneIn directory depending on the supplied options paramethers",
-    "lineNumber": 241,
+    "lineNumber": 244,
     "params": [
       {
         "nullable": null,
@@ -913,7 +923,7 @@
     "longname": "src/index.js~TuneIn#browse_local",
     "access": "public",
     "description": "Browse the local streams category",
-    "lineNumber": 253,
+    "lineNumber": 256,
     "params": [
       {
         "nullable": null,
@@ -943,7 +953,7 @@
     "longname": "src/index.js~TuneIn#browse_music",
     "access": "public",
     "description": "Browse the Music streams category",
-    "lineNumber": 261,
+    "lineNumber": 264,
     "params": [
       {
         "nullable": null,
@@ -973,7 +983,7 @@
     "longname": "src/index.js~TuneIn#browse_talk",
     "access": "public",
     "description": "Browse the talk streams category",
-    "lineNumber": 269,
+    "lineNumber": 272,
     "params": [
       {
         "nullable": null,
@@ -1003,7 +1013,7 @@
     "longname": "src/index.js~TuneIn#browse_sports",
     "access": "public",
     "description": "Browse the sports streams category",
-    "lineNumber": 277,
+    "lineNumber": 280,
     "params": [
       {
         "nullable": null,
@@ -1033,7 +1043,7 @@
     "longname": "src/index.js~TuneIn#browse_locations",
     "access": "public",
     "description": "Browse streams locations",
-    "lineNumber": 285,
+    "lineNumber": 288,
     "params": [
       {
         "nullable": null,
@@ -1063,7 +1073,7 @@
     "longname": "src/index.js~TuneIn#browse_langs",
     "access": "public",
     "description": "Browse streams languages",
-    "lineNumber": 293,
+    "lineNumber": 296,
     "params": [
       {
         "nullable": null,
@@ -1093,7 +1103,7 @@
     "longname": "src/index.js~TuneIn#browse_podcast",
     "access": "public",
     "description": "Browse the podcasts directory",
-    "lineNumber": 301,
+    "lineNumber": 304,
     "params": [
       {
         "nullable": null,
@@ -1123,7 +1133,7 @@
     "longname": "src/index.js~TuneIn#browse_popular",
     "access": "public",
     "description": "Browse the popular streams category",
-    "lineNumber": 309,
+    "lineNumber": 312,
     "params": [
       {
         "nullable": null,
@@ -1153,7 +1163,7 @@
     "longname": "src/index.js~TuneIn#browse_best",
     "access": "public",
     "description": "Browse the best streams category",
-    "lineNumber": 317,
+    "lineNumber": 320,
     "params": [
       {
         "nullable": null,
@@ -1182,7 +1192,7 @@
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"node-tunein-radio\",\n  \"version\": \"0.1.1\",\n  \"description\": \"NodeJS Module to browse, search and play streams from TuneIn Radio\",\n  \"main\": \"src/index.js\",\n  \"scripts\": {\n    \"test\": \"mocha --reporter spec\",\n    \"cover\": \"node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*\",\n    \"lint\": \"eslint --ignore-path .gitignore .\",\n    \"docs\": \"./node_modules/.bin/esdoc\"\n  },\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/piffio/node-tunein-radio.git\"\n  },\n  \"keywords\": [\n    \"tunein\",\n    \"volumio\"\n  ],\n  \"author\": \"Sergio Visinoni <piffio@piffio.org> (https://github.com/piffio/)\",\n  \"license\": \"ISC\",\n  \"bugs\": {\n    \"url\": \"https://github.com/piffio/node-tunein-radio/issues\"\n  },\n  \"homepage\": \"https://github.com/piffio/node-tunein-radio#readme\",\n  \"engines\": {\n    \"node\": \">=6.11.0\"\n  },\n  \"dependencies\": {\n    \"ajv\": \"^6.1.1\",\n    \"axios\": \"^0.18.0\",\n    \"axios-extensions\": \"^1.2.0\",\n    \"qs\": \"^6.5.1\"\n  },\n  \"devDependencies\": {\n    \"chai\": \"^4.1.2\",\n    \"coveralls\": \"^3.0.0\",\n    \"eslint\": \"^4.9.0\",\n    \"eslint-config-airbnb-base\": \"^12.1.0\",\n    \"eslint-plugin-import\": \"^2.7.0\",\n    \"istanbul\": \"^0.4.5\",\n    \"mocha\": \"^5.0.1\",\n    \"esdoc\": \"^1.0.4\",\n    \"esdoc-node\": \"^1.0.3\",\n    \"esdoc-standard-plugin\": \"^1.0.0\"\n  }\n}\n",
+    "content": "{\n  \"name\": \"node-tunein-radio\",\n  \"version\": \"0.2.0\",\n  \"description\": \"NodeJS Module to browse, search and play streams from TuneIn Radio\",\n  \"main\": \"src/index.js\",\n  \"scripts\": {\n    \"test\": \"mocha --reporter spec\",\n    \"cover\": \"node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*\",\n    \"lint\": \"eslint --ignore-path .gitignore .\",\n    \"docs\": \"./node_modules/.bin/esdoc\"\n  },\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/piffio/node-tunein-radio.git\"\n  },\n  \"keywords\": [\n    \"tunein\",\n    \"volumio\"\n  ],\n  \"author\": \"Sergio Visinoni <piffio@piffio.org> (https://github.com/piffio/)\",\n  \"license\": \"ISC\",\n  \"bugs\": {\n    \"url\": \"https://github.com/piffio/node-tunein-radio/issues\"\n  },\n  \"homepage\": \"https://github.com/piffio/node-tunein-radio#readme\",\n  \"engines\": {\n    \"node\": \">=6.11.0\"\n  },\n  \"dependencies\": {\n    \"ajv\": \"^6.1.1\",\n    \"axios\": \"^0.18.0\",\n    \"axios-extensions\": \"^1.2.0\",\n    \"qs\": \"^6.5.1\"\n  },\n  \"devDependencies\": {\n    \"chai\": \"^4.1.2\",\n    \"coveralls\": \"^3.0.0\",\n    \"eslint\": \"^4.9.0\",\n    \"eslint-config-airbnb-base\": \"^12.1.0\",\n    \"eslint-plugin-import\": \"^2.7.0\",\n    \"istanbul\": \"^0.4.5\",\n    \"mocha\": \"^5.0.1\",\n    \"esdoc\": \"^1.0.4\",\n    \"esdoc-node\": \"^1.0.3\",\n    \"esdoc-standard-plugin\": \"^1.0.0\"\n  }\n}\n",
     "longname": "/home/piffio/src/volumio/node-tunein-radio/package.json",
     "name": "package.json",
     "static": true,

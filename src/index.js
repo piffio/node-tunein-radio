@@ -141,13 +141,16 @@ module.exports =  class TuneIn {
    * Describe a stream. This method will retrieve detailed information about a stream.
    *
    * @param {string} id The ID of the stream to fetch information for
+   * @param {boolean} nowplaying If true it also fetches information about the show being currently aired
    */
-  describe(id) {
+  describe(id, nowplaying = false) {
     let req = {};
     req.params = {};
 
     req.url = '/Describe.ashx';
-    req.params.c = 'nowplaying';
+    if (nowplaying == true) {
+      req.params.c = 'nowplaying';
+    }
     req.params.id = id;
 
     return this._call_tunein_get(req);
