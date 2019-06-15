@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/piffio/node-tunein-radio#readme",
   "engines": {
-    "node": ">=6.11.0"
+    "node": ">=8.11.1"
   },
   "dependencies": {
     "ajv": "^6.1.1",
