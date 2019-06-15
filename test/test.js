@@ -384,7 +384,7 @@ describe('#tuneinRadio', function () {
 
       expect(streamDetail.key).to.equal('station');
       expect(streamDetail.text).to.equal('RAI Radio 3 93.7');
-      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/p317691q.png');
+      expect(streamDetail.image).to.match(/http:\/\/cdn-radiotime-logos\.tunein\.com\/(__s25211q.jpg\?t=152993|p317691q\.png)/);
     });
   });
 });
