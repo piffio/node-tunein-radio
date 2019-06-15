@@ -71,19 +71,19 @@ describe('#tuneinRadio', function () {
       expect(status).to.equal('200');
 
       let items = results.body;
-      if (items !== undefined) {
-        expect(items).to.be.an('array');
+      expect(items).to.be.an('array');
 
-        let stationList = items[0];
-        expect(stationList.element).to.equal("outline");
-        expect(stationList.text).to.not.be.undefined;
+      let stationList = items[0];
+      expect(stationList.element).to.equal("outline");
+      expect(stationList.text).to.not.be.undefined;
+      if (stationsList.children !== undefined) {
         expect(stationList.children).to.be.an('array');
-
-        let station = stationList.children[0];
-        expect(station.element).to.equal("outline");
-        expect(station.type).to.equal("audio");
-        expect(station.item).to.equal("station");
       }
+
+      let station = stationList.children[0];
+      expect(station.element).to.equal("outline");
+      expect(station.type).to.equal("audio");
+      expect(station.item).to.equal("station");
     });
   });
 
