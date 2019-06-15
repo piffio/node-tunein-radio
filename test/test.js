@@ -71,7 +71,7 @@ describe('#tuneinRadio', function () {
       expect(status).to.equal('200');
 
       let items = results.body;
-      if (items !== null) {
+      if (items !== undefined) {
         expect(items).to.be.an('array');
 
         let stationList = items[0];
