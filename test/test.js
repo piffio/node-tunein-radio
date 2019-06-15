@@ -323,8 +323,8 @@ describe('#tuneinRadio', function() {
 
       let station = items[0];
       expect(station.element).to.equal("outline");
-      expect(station.type).to.equal("audio");
-      expect(station.item).to.equal("station");
+      expect(station.type).to.equal("link");
+      expect(station.item).to.equal("show");
     });
   });
 
@@ -366,7 +366,7 @@ describe('#tuneinRadio', function() {
 
       expect(streamDetail.element).to.equal('station');
       expect(streamDetail.name).to.equal('RAI Radio 3');
-      expect(streamDetail.logo).to.equal('http://cdn-profiles.tunein.com/s25211/images/logoq.jpg');
+      expect(streamDetail.logo).to.equal('http://cdn-profiles.tunein.com/s25211/images/logoq.jpg?t=152993');
     });
   });
 
@@ -382,7 +382,7 @@ describe('#tuneinRadio', function() {
 
       expect(streamDetail.key).to.equal('station');
       expect(streamDetail.text).to.equal('RAI Radio 3 93.7');
-      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/__s25211q.jpg');
+      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/__s25211q.jpg?t=152993');
     });
   });
 });
