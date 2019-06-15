@@ -12,16 +12,16 @@ var tuneinOptions = {
 
 var tunein = new TuneIn(tuneinOptions);
 
-describe('#tuneinRadio', function() {
+describe('#tuneinRadio', function () {
   // Test call to authenticate()
-  it('should return 200 if login is successful', function() {
+  it('should return 200 if login is successful', function () {
     var authOptions = {
       username: process.env.TUNEIN_USER,
       password: process.env.TUNEIN_PASSWD,
     };
 
     let browse = tunein.authenticate(authOptions);
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let status = results.head.status;
       expect(status).to.equal('200');
 
@@ -33,9 +33,9 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse()
-  it('should return main categories when browsing with no parameters', function() {
+  it('should return main categories when browsing with no parameters', function () {
     let browse = tunein.browse();
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Browse');
 
@@ -63,33 +63,35 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse_local()
-  it('browse_local should return a list of radio stations', function() {
+  it('browse_local should return a list of radio stations', function () {
     let browse = tunein.browse_local();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let status = results.head.status;
       expect(status).to.equal('200');
 
       let items = results.body;
-      expect(items).to.be.an('array');
+      if (items !== null) {
+        expect(items).to.be.an('array');
 
-      let stationList = items[0];
-      expect(stationList.element).to.equal("outline");
-      expect(stationList.text).to.not.be.undefined;
-      expect(stationList.children).to.be.an('array');
+        let stationList = items[0];
+        expect(stationList.element).to.equal("outline");
+        expect(stationList.text).to.not.be.undefined;
+        expect(stationList.children).to.be.an('array');
 
-      let station = stationList.children[0];
-      expect(station.element).to.equal("outline");
-      expect(station.type).to.equal("audio");
-      expect(station.item).to.equal("station");
+        let station = stationList.children[0];
+        expect(station.element).to.equal("outline");
+        expect(station.type).to.equal("audio");
+        expect(station.item).to.equal("station");
+      }
     });
   });
 
   // Test calls to browse_music()
-  it('browse_music should return a list of music genres', function() {
+  it('browse_music should return a list of music genres', function () {
     let browse = tunein.browse_music();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Music');
 
@@ -114,10 +116,10 @@ describe('#tuneinRadio', function() {
 
 
   // Test calls to browse_talk
-  it('browse_talk should return a list of talk music categories', function() {
+  it('browse_talk should return a list of talk music categories', function () {
     let browse = tunein.browse_talk();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Talk');
 
@@ -141,10 +143,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse_sports
-  it('browse_sports should return a list of sport radio categories', function() {
+  it('browse_sports should return a list of sport radio categories', function () {
     let browse = tunein.browse_sports();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Sports');
 
@@ -168,10 +170,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse_locations
-  it('browse_locations should return a list of geographical areas', function() {
+  it('browse_locations should return a list of geographical areas', function () {
     let browse = tunein.browse_locations();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('By Location');
 
@@ -196,10 +198,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse_langs
-  it('browse_langs should return a list of languages', function() {
+  it('browse_langs should return a list of languages', function () {
     let browse = tunein.browse_langs();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('By Language');
 
@@ -217,10 +219,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse_podcast
-  it('browse_podcast should return a list of podcasts', function() {
+  it('browse_podcast should return a list of podcasts', function () {
     let browse = tunein.browse_podcast();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Podcasts');
 
@@ -240,10 +242,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse_popular
-  it('browse_popular should return a list of popular radio stations', function() {
+  it('browse_popular should return a list of popular radio stations', function () {
     let browse = tunein.browse_popular();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Trending');
 
@@ -261,10 +263,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test calls to browse_best
-  it('browse_best should return a list of the best radio stations', function() {
+  it('browse_best should return a list of the best radio stations', function () {
     let browse = tunein.browse_best();
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.be.undefined;
 
@@ -282,10 +284,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test call to tune_radio
-  it('tune_radio should return details about a radio stream', function() {
+  it('tune_radio should return details about a radio stream', function () {
     let browse = tunein.tune_radio('s67868');
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.be.undefined;
 
@@ -299,9 +301,9 @@ describe('#tuneinRadio', function() {
       expectedURL = expectedURL + "DIST=TuneIn&TGT=TuneIn&maxServers=2";
       if (tuneinOptions.partnerId != undefined) {
         expectedURL = expectedURL + "&ua=" + tuneinOptions.partnerId
-        + "&ttag=" + tuneinOptions.partnerId;
+          + "&ttag=" + tuneinOptions.partnerId;
       }
-      
+
       expect(station.url).to.equal(expectedURL);
       expect(station.media_type).to.equal("mp3");
       expect(station.guide_id).to.equal("e2060591");
@@ -309,10 +311,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test call to search
-  it('search should return a list of matches for a particular query', function() {
+  it('search should return a list of matches for a particular query', function () {
     let browse = tunein.search('rai radio');
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Search Results: rai radio');
 
@@ -330,7 +332,7 @@ describe('#tuneinRadio', function() {
   });
 
   // Test call to browse_show
-  it('browse_show should return a list of episodes for a Show', function() {
+  it('browse_show should return a list of episodes for a Show', function () {
     let options = {
       c: 'pbrowse',
       id: 'p191418',
@@ -338,7 +340,7 @@ describe('#tuneinRadio', function() {
 
     let browse = tunein.browse_show(options);
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let title = results.head.title;
       expect(title).to.equal('Nocturnal Listening Options');
 
@@ -356,10 +358,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test call to describe
-  it('describe should return detailed information about a stream', function() {
+  it('describe should return detailed information about a stream', function () {
     let browse = tunein.describe('s25211');
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let status = results.head.status;
       expect(status).to.equal('200');
 
@@ -372,10 +374,10 @@ describe('#tuneinRadio', function() {
   });
 
   // Test call to describe
-  it('describe nowplaying should return detailed information about a stream', function() {
+  it('describe nowplaying should return detailed information about a stream', function () {
     let browse = tunein.describe('s25211', true);
 
-    return browse.then(function(results) {
+    return browse.then(function (results) {
       let status = results.head.status;
       expect(status).to.equal('200');
 
@@ -383,7 +385,7 @@ describe('#tuneinRadio', function() {
 
       expect(streamDetail.key).to.equal('station');
       expect(streamDetail.text).to.equal('RAI Radio 3 93.7');
-      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/__s25211q.jpg?t=152993');
+      expect(streamDetail.image).to.equal('http://cdn-radiotime-logos.tunein.com/p317691q.png');
     });
   });
 });
