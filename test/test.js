@@ -296,11 +296,12 @@ describe('#tuneinRadio', function() {
       expect(station.element).to.equal("audio");
 
       let expectedURL = "http://provisioning.streamtheworld.com/pls/MAXIMAFM.pls?";
-      if (tuneinOptions.partnerId != undefined) {
-        expectedURL = expectedURL + "ua=" + tuneinOptions.partnerId
-        + "&ttag=" + tuneinOptions.partnerId + '&';
-      }
       expectedURL = expectedURL + "DIST=TuneIn&TGT=TuneIn&maxServers=2";
+      if (tuneinOptions.partnerId != undefined) {
+        expectedURL = expectedURL + "&ua=" + tuneinOptions.partnerId
+        + "&ttag=" + tuneinOptions.partnerId;
+      }
+      
       expect(station.url).to.equal(expectedURL);
       expect(station.media_type).to.equal("mp3");
       expect(station.guide_id).to.equal("e2060591");
